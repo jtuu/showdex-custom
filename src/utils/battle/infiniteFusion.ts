@@ -30,3 +30,58 @@ export function calculateFusedBaseStats(head: Showdown.Species, body: Showdown.S
     spd: fuseStat(head.baseStats.spd, body.baseStats.spd),
   };
 }
+
+// For some reason, these pokemon have their primary and secondary types swapped in IF.
+const pokemonWithSwappedTypes = [
+  'Magnemite',
+  'Magneton',
+  'Spiritomb',
+  'Trevenant',
+];
+
+export function getFusedTypes(head: Showdown.Species, body: Showdown.Species): Showdown.TypeName[] {
+  // Type fusion logic source: https://infinitefusion.fandom.com/wiki/Fusion_FAQs#Typing
+
+  const headTypes = head.types;
+  const bodyTypes = body.types;
+
+  // Swap types if needed
+  if (pokemonWithSwappedTypes.includes(head.baseSpecies)) {
+    [headTypes[1], headTypes[0]] = [headTypes[0], headTypes[1]];
+  }
+  if (pokemonWithSwappedTypes.includes(body.baseSpecies)) {
+    [bodyTypes[1], bodyTypes[0]] = [bodyTypes[0], bodyTypes[1]];
+  }
+
+  // Always use head's primary type, unless it has a special "dominant" type.
+  // In the current version the dominant type rule only applies to Normal/Flying pokemon where
+  // the Flying type will always be picked over the Normal type regardless of other rules.
+  const headPrimaryType = headTypes[0];
+  let resultPrimaryType = headPrimaryType;
+  const headHasSecondaryType = headTypes.length > 1;
+  if (headHasSecondaryType) {
+    const headSecondaryType = headTypes[1];
+    const headIsNormalFlying = headPrimaryType === 'Normal' && headSecondaryType === 'Flying';
+    if (headIsNormalFlying) {
+      resultPrimaryType = 'Flying';
+    }
+  }
+
+  // Figure out which type to use as secondary type from body.
+  const bodyPrimaryType = bodyTypes[0];
+  const bodyHasSecondaryType = bodyTypes.length > 1;
+  // Use body primary type as the secondary type unless body has a secondary type.
+  let resultSecondaryType = bodyPrimaryType;
+  if (bodyHasSecondaryType) {
+    const bodySecondaryType = bodyTypes[1];
+    // Use secondary type from body. If head already provides that type then use body primary type.
+    resultSecondaryType = resultPrimaryType === bodySecondaryType ? bodyPrimaryType : bodySecondaryType;
+  }
+
+  if (resultPrimaryType === resultSecondaryType) {
+    // Deduplicate
+    return [resultPrimaryType];
+  }
+
+  return [resultPrimaryType, resultSecondaryType];
+}

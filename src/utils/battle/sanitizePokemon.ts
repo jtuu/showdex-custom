@@ -17,7 +17,7 @@ import { detectSpeciesForme } from './detectSpeciesForme';
 import { detectToggledAbility } from './detectToggledAbility';
 import { sanitizeMoveTrack } from './sanitizeMoveTrack';
 import { sanitizeVolatiles } from './sanitizeVolatiles';
-import { getFusionPartNames, calculateFusedBaseStats } from './infiniteFusion';
+import { getFusionPartNames, calculateFusedBaseStats, getFusedTypes } from './infiniteFusion';
 
 /* eslint-disable @typescript-eslint/indent */
 
@@ -364,7 +364,9 @@ export const sanitizePokemon = <
   // (checking against typeChanged since if true, should've been already updated above)
   const speciesTypes = (transformedSpecies || species)?.types;
 
-  if (!typeChanged && speciesTypes?.length) {
+  if (isFusedPokemon) {
+    sanitizedPokemon.types = getFusedTypes(dex.species.get(fusionPartNames.headName), dex.species.get(fusionPartNames.bodyName));
+  } else if (!typeChanged && speciesTypes?.length) {
     sanitizedPokemon.types = [...speciesTypes];
   }
 
