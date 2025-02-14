@@ -4,6 +4,9 @@ export function getFusionPartNames(pokemon: CalcdexPokemon): { headName: string;
   // Find body name by parsing the `details` property.
   // Full text of `details` is something like "Houndoom, L76, F, fusion: Jolteon".
   // Match everything after "fusion: " until end of string or comma.
+  if (!pokemon.details) {
+    return null;
+  }
   const bodyNameMatch = pokemon.details.match(/fusion: (.+?)(?:,|$)/);
   if (!bodyNameMatch || bodyNameMatch.length < 2) {
     return null;
