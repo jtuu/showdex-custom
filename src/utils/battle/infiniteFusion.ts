@@ -38,8 +38,14 @@ export function calculateFusedBaseStats(head: Showdown.Species, body: Showdown.S
 const pokemonWithSwappedTypes = [
   'Magnemite',
   'Magneton',
+  'Magnezone',
   'Spiritomb',
+  'Ferroseed',
+  'Ferrothorn',
+  'Phantump',
   'Trevenant',
+  'Sandygast',
+  'Palossand',
 ];
 
 export function getFusedTypes(head: Showdown.Species, body: Showdown.Species): Showdown.TypeName[] {
